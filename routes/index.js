@@ -5,6 +5,6 @@ routes.get('/', (req, res, next) => {
     res.json('This is Home page ')
 })
 
-routes.use('/user', require('./v1/User.routes.js'))
+routes.use('/user', require('./v1/users/User.route.js'))
 
 module.exports = routes;
