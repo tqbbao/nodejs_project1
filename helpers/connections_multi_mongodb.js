@@ -18,10 +18,13 @@ function newConnection(uri){
     conn.on('error', function(error){
         console.log(`Mongodb::: error:::${JSON.stringify(error)}`)
     });
+
     process.on('SIGINT', async() => {
+        console.log(`Mongodb::: disconnected:::${conn.name}`);
         await conn.close();
         process.exit(0);
-    })
+    });
+
     return conn;
 }
 

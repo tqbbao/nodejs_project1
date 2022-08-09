@@ -2,6 +2,12 @@ const express = require('express');
 const routes = express.Router();
 const User = require('../../../models/User.model.js');
 const createError = require('http-errors');
+const {userValidate} = require('../../../helpers/validation.js');
+const { create } = require('../../../models/User.model.js');
+
+const {signAccessToken, verifyAccessToken, signRefreshToken} = require('../../../helpers/jwt_service.js');
+
+
 routes.get('/', (req, res, next) => {
     res.json('Listen users');
 })
@@ -10,28 +16,62 @@ routes.post('/register',async (req, res, next) => {
     console.log(req.body);
     try{
         const {email, password} = req.body;
-        if(!email || !password){
-            throw createError.BadRequest();
+        const {error} = userValidate(req.body);
+        console.log(`:::error validation::`, error);
+        if(error){
+            throw createError(error.details[0].message)
         }
         const isExits = await User.findOne({
-            username: email
+            email: email
         });
         if(isExits){
             throw createError.Conflict(`${email} is re`);
         }
 
-        const isCreate = await User.create({
-            username: email,
-            password: password
+        const user = new User({
+            email: email,
+            password
         })
+        const saveUser = await user.save();
         return res.json({
             status: 'okay',
-            elements: isCreate
+            elements: saveUser
         })
     } catch(error){
         next(error);
     }
 
+})
+
+routes.post('/login',async (req, res, next) => {
+    try {
+        const {email, password} = req.body;
+        const {error} = userValidate(req.body);
+        console.log(`:::error validation::`, error);
+        if(error){
+            throw createError(error.details[0].message)
+        }
+        const user = await User.findOne({email});
+        if(!user){
+            throw createError.NotFound('User not registerd');
+        }
+        const isValid = await user.isCheckPassword(password);
+        if(!isValid){
+            throw createError.Unauthorized();
+        }
+
+        const accessToken = await signAccessToken(user._id);
+        const refreshToken = await signRefreshToken(user._id);
+
+        // res.send(user);
+        res.json({
+            user,
+            accessToken,
+            refreshToken
+        })
+    } catch (error) {
+        next(error);
+    }
 })
 
 routes.delete('/id', (req, res, next) => {
@@ -45,6 +85,24 @@ routes.patch('/id', (req, res, next) => {
 routes.get('/id', (req, res, next) => {
     res.json('Get a users');
 })
+
+routes.get('/getlist',verifyAccessToken, (req, res, next) => {
+    console.log(req.headers);
+    const listUsers = [
+        {
+            email: 'abc@gmail.com'
+        },
+        {
+            email: 'bcd@gmail.com'
+        }
+    ]
+    res.json({
+        listUsers
+    })
+
+})
+
+
 module.exports = routes;
 
 // "/abc" => /abc
