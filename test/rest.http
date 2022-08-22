@@ -22,9 +22,18 @@ POST  http://localhost:8080/user/login
 Content-Type: application/json
 
 {
-    "email": "ccthann@gmail.com",
+    "email": "asdsdsdsadasdn@gmail.com",
     "password": "123abc123"
 }
+### Refesh-token
+POST  http://localhost:8080/user/refresh-token
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmYyMGIwMGQ1MDZmNDllYmExM2NkMDQiLCJpYXQiOjE2NjA3MDY4MzAsImV4cCI6MTY2MDc0MjgzMH0.wuXSDwPaq1VSf8--FtYQYhB3xZ52wWwPw3vPVWp7_2Y"
+}
+
+
 ### Update a User
 PATCH  http://localhost:8080/user/id
 ### Update a User

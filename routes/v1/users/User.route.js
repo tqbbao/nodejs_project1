@@ -44,6 +44,8 @@ routes.post('/register',async (req, res, next) => {
 })
 
 routes.post('/login',async (req, res, next) => {
+    console.log(req.body);
+
     try {
         const {email, password} = req.body;
         const {error} = userValidate(req.body);
@@ -73,6 +75,17 @@ routes.post('/login',async (req, res, next) => {
         next(error);
     }
 })
+
+routes.post('/refresh-token', (req, res, next) => {
+    try {
+        console.log(req.body);
+        const {refreshToken} = req.body;
+
+    } catch (error) {
+        next(error);
+    }
+})
+
 
 routes.delete('/id', (req, res, next) => {
     res.json('Delete a users');
